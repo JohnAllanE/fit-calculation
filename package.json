@@ -1,0 +1,24 @@
+{
+  "name": "fit-calc",
+  "version": "0.1.0",
+  "description": "Hole/shaft fit calculator for ANSI/ASME B4.1 and ISO 286 using hard-coded standard tables",
+  "type": "module",
+  "bin": {
+    "fit": "bin/fit.js"
+  },
+  "scripts": {
+    "test": "node --test \"test/*.test.js\"",
+    "fit": "node bin/fit.js",
+    "build:web": "node scripts/build-web.mjs",
+    "build": "npm run build:web",
+    "web": "npm run build:web && node scripts/serve.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "UNLICENSED",
+  "private": true,
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
+}

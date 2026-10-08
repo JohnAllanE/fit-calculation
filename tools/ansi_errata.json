@@ -1,0 +1,147 @@
+{
+ "FN2|0.71|0.95": {
+  "fmin": -1.9,
+  "fmax": -0.6,
+  "_why": "source prints '.06' for 0.6; min interference = shaft lo 1.4 - hole 0.8 = 0.6"
+ },
+ "FN2|3.94|4.73": {
+  "hh": 1.4,
+  "_why": "source hole '+1.' truncated; H7 at 3.15-4.73 is 1.4 (also min int 3.0-1.4=1.6 as printed)"
+ },
+ "FN3|6.3|7.09": {
+  "sh": 7.0,
+  "sl": 6.0,
+  "_why": "source shaft '+7.0 +8.0'; printed 4.4/7.0 interference with hole 1.6 requires +7.0/+6.0"
+ },
+ "FN4|3.94|4.73": {
+  "sh": 6.9,
+  "sl": 6.0,
+  "_why": "source shaft '+6.9 +8.0'; printed 4.6/6.9 with hole 1.4 requires +6.9/+6.0"
+ },
+ "FN4|15.75|17.72": {
+  "fmin": -21.6,
+  "fmax": -17.5,
+  "_why": "source min interference '7.5'; shaft lo 20.0 - hole 2.5 = 17.5"
+ },
+ "LC2|19.69|30.09": {
+  "hh": 3.0,
+  "sh": 0.0,
+  "sl": -2.0,
+  "fmin": 0.0,
+  "fmax": 5.0,
+  "_why": "source shaft '0 +2.0' sign typo; h6 is 0/-2.0, max clearance 3.0+2.0=5.0"
+ },
+ "LC3|0.0|0.12": {
+  "hh": 0.6,
+  "sh": 0.0,
+  "sl": -0.4,
+  "fmin": 0.0,
+  "fmax": 1.0,
+  "_why": "source cells shifted in this row; H8 +0.6, h7 0/-0.4 (IT7=0.4), printed clearance 0-1.0"
+ },
+ "LC4|0.0|0.12": {
+  "hh": 1.6,
+  "sh": 0.0,
+  "sl": -1.0,
+  "fmin": 0.0,
+  "fmax": 2.6,
+  "_why": "source cells shifted in this row; H10 +1.6, h9 0/-1.0, printed clearance 0-2.6"
+ },
+ "LC5|0.0|0.12": {
+  "hh": 0.4,
+  "sh": -0.1,
+  "sl": -0.35,
+  "fmin": 0.1,
+  "fmax": 0.75,
+  "_why": "source cells shifted in this row; H7 +0.4, g6 -0.1/-0.35, printed 0.1-0.75"
+ },
+ "LC6|0.0|0.12": {
+  "hh": 1.0,
+  "sh": -0.3,
+  "sl": -0.9,
+  "fmin": 0.3,
+  "fmax": 1.9,
+  "_why": "source clearance '0. 1.9' truncated; min = 0.3 (shaft hi), max = 1.0+0.9"
+ },
+ "LN3|1.97|3.15": {
+  "hh": 1.2,
+  "sh": 2.3,
+  "sl": 1.6,
+  "fmin": -2.3,
+  "fmax": -0.4,
+  "_why": "source shaft '+3.2 +1.6' transposed digits; printed interference 0.4-2.3, r6 tol 0.7 = IT6"
+ },
+ "LT2|15.75|19.69": {
+  "hh": 4.0,
+  "sh": 1.2,
+  "sl": -1.2,
+  "fmin": -1.2,
+  "fmax": 5.2,
+  "_why": "source hole '+0.4' ; H8 at 15.75-19.69 is 4.0 (printed fit max 5.2 = 4.0+1.2)"
+ },
+ "LT4|9.85|12.41": {
+  "hh": 3.0,
+  "sh": 2.2,
+  "sl": 0.2,
+  "fmin": -2.2,
+  "fmax": 2.8,
+  "_why": "source fit min '-2.0'; k7 +2.2/+0.2 (IT7=2.0 here) gives -2.2"
+ },
+ "RC1|1.97|3.15": {
+  "hh": 0.5,
+  "sh": -0.4,
+  "sl": -0.7,
+  "fmin": 0.4,
+  "fmax": 1.2,
+  "_why": "source clearance '0.4 0.2' max typo; 0.5+0.7=1.2"
+ },
+ "RC4|0.71|1.19": {
+  "hh": 1.2,
+  "sh": -0.8,
+  "sl": -1.6,
+  "fmin": 0.8,
+  "fmax": 2.8,
+  "_why": "source hole '+0.2'; H8 at 0.71-1.19 is 1.2 (1.2+1.6=2.8 as printed)"
+ },
+ "RC9|0.24|0.4": {
+  "hh": 3.5,
+  "sh": -5.0,
+  "sl": -7.2,
+  "fmin": 5.0,
+  "fmax": 10.7,
+  "_why": "source shaft hi '-5.5'; printed min clearance 5.0, max 3.5+7.2=10.7"
+ },
+ "RC9|3.15|4.73": {
+  "hh": 9.0,
+  "sh": -10.0,
+  "sl": -15.0,
+  "fmin": 10.0,
+  "fmax": 24.0,
+  "_why": "source hole '-9.0' sign typo and clearance '10. 24.0' truncated"
+ },
+ "RC9|19.69|30.09": {
+  "hh": 20.0,
+  "sh": -30.0,
+  "sl": -42.0,
+  "fmin": 30.0,
+  "fmax": 62.0,
+  "_why": "source shaft lo '-40.0'; printed max clearance 62.0 = 20+42; neighbours' shaft tol follows IT10 (12)"
+ },
+ "FN4|35.47|41.49": {
+  "_review": "Shaft u6 tolerance is 3.5 thou here; every other FN4 row (and IT6 for this range, 2.5) suggests +42.5/+40.0 and interference 36.0-42.5. The source prints 43.5 in both the fit and the shaft cells. VERIFY AGAINST THE PRINTED STANDARD."
+ },
+ "RC2|171.9|200.0": {
+  "_review": "Shaft g5 tolerance is 4 thou here; H5 for this range is 6 (RC1 hole), which would give -8/-14 and clearance 8-24. The source prints 22 and -12 consistently. VERIFY AGAINST THE PRINTED STANDARD."
+ },
+ "LT1|0.0|0.12": {
+  "hh": 0.4,
+  "sh": 0.12,
+  "sl": -0.12,
+  "fmin": -0.12,
+  "fmax": 0.52,
+  "_why": "Machinery's Handbook p.1534 Table 4 prints js6 = +0.12/-0.12 and fit -0.12/+0.52 (source rounded to 0.1/-0.1/0.5); also esierra.me"
+ },
+ "LC6|1.97|3.15": {
+  "_review": "Machinery's Handbook (1533) and ANSI B4.1 print shaft f8 = -1.0/-3.0 for this row, but also clearance 1.2-6.0 and an f8 tolerance of 1.8 (IT8 for 1.97-3.15 in), which both require -1.2/-3.0. The engine uses -1.2/-3.0; a hand calculation from the printed shaft limits gives a minimum clearance of 1.0."
+ }
+}

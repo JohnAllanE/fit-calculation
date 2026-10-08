@@ -1,0 +1,16 @@
+# system,fit,hole,shaft,nominal,units     (known-answer rows are asserted in test/; this file is for eyeballing)
+system,fit,hole,shaft,nominal,units
+ansi,RC5,,,2,in
+ansi,RC3,,,3/4,in
+ansi,LC2,,,1.25,in
+ansi,LT3,,,1,in
+ansi,LN2,,,0.5,in
+ansi,FN2,,,2,in
+ansi,RC5,,,50.8,mm
+iso,H7/g6,,,25,mm
+iso,,H7,p6,40,mm
+iso,,H8,f7,50,mm
+iso,,H7,k6,8,mm
+iso,H7/g6,,,1,in
+iso,H7/t6,,,10,mm
+ansi,LT1,,,25,in

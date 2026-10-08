@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fit Calculator</title>
+<meta name="description" content="Hole and shaft limits, tolerances and clearance/interference for ANSI B4.1 and ISO 286 fits, worked from the standards' tables.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <h1>Fit Calculator</h1>
+    <p class="sub">Hole &amp; shaft limits for <b>ANSI/ASME B4.1</b> and <b>ISO 286</b>, worked from the standards' tables</p>
+  </div>
+</header>
+
+<main class="wrap grid">
+  <section class="panel" aria-labelledby="in-h">
+    <h2 id="in-h">Inputs</h2>
+
+    <div class="field">
+      <span class="lbl" id="lbl-system">Standard (which tables)</span>
+      <div class="seg" role="radiogroup" aria-labelledby="lbl-system" id="seg-system">
+        <button type="button" role="radio" data-v="ansi">ANSI B4.1</button>
+        <button type="button" role="radio" data-v="iso">ISO 286</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <span class="lbl" id="lbl-units">Units (input and results)</span>
+      <div class="seg" role="radiogroup" aria-labelledby="lbl-units" id="seg-units">
+        <button type="button" role="radio" data-v="in">inch</button>
+        <button type="button" role="radio" data-v="mm">mm</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="lbl" for="nominal">Nominal (basic) size</label>
+      <div class="with-unit"><input id="nominal" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="e.g. 2, 1.5, 1-1/2"><span id="nominal-unit" class="unit">in</span></div>
+      <p class="hint" id="nominal-hint"></p>
+    </div>
+
+    <div id="ansi-fields" class="field">
+      <label class="lbl" for="ansi-class">Fit class</label>
+      <select id="ansi-class"></select>
+      <p class="hint" id="ansi-hint"></p>
+    </div>
+
+    <div id="iso-fields">
+      <div class="field">
+        <span class="lbl">Hole (internal feature)</span>
+        <div class="pair"><select id="iso-hole-letter" aria-label="Hole letter"></select><select id="iso-hole-grade" aria-label="Hole tolerance grade"></select></div>
+      </div>
+      <div class="field">
+        <span class="lbl">Shaft (external feature)</span>
+        <div class="pair"><select id="iso-shaft-letter" aria-label="Shaft letter"></select><select id="iso-shaft-grade" aria-label="Shaft tolerance grade"></select></div>
+      </div>
+      <div class="field">
+        <span class="lbl">Preferred fits (ISO 286-1 first choice)</span>
+        <div class="chips" id="chips-hole"></div>
+        <div class="chips" id="chips-shaft"></div>
+      </div>
+    </div>
+
+    <div class="field links">
+      <button type="button" class="linkbtn" id="share">Copy link to this problem</button>
+      <span id="share-msg" class="hint" aria-live="polite"></span>
+    </div>
+  </section>
+
+  <section class="panel results" aria-live="polite" aria-labelledby="out-h">
+    <h2 id="out-h">Results</h2>
+    <div id="error" class="msg err" hidden></div>
+    <div id="out" hidden>
+      <div class="headline">
+        <div>
+          <div class="designation" id="designation"></div>
+          <div class="desc" id="desc"></div>
+        </div>
+        <div class="badge" id="badge"></div>
+      </div>
+      <div id="notes"></div>
+
+      <div class="fitband" id="fitband"></div>
+
+      <div class="two">
+        <figure class="diagram">
+          <svg id="diagram" role="img" aria-labelledby="diagram-title" viewBox="0 0 470 342"></svg>
+          <figcaption id="diagram-title">Tolerance zones relative to the nominal size (deviations in <span id="diag-unit"></span>)</figcaption>
+        </figure>
+
+        <table class="tbl" id="table">
+          <thead><tr><th></th><th>Hole <small>internal</small></th><th>Shaft <small>external</small></th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <h3>Ways to write the same sizes</h3>
+      <div class="notations" id="notations"></div>
+
+      <details class="trace">
+        <summary>Show the table look-ups (hand procedure)</summary>
+        <ol id="trace"></ol>
+      </details>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap foot">
+  <p>All values come from hard-coded tables: ISO 286-1:2010 (Tables 1–5, up to 500&nbsp;mm) and ANSI B4.1-1967 (R1987). ANSI sizes up to 19.69&nbsp;in were checked against Machinery's Handbook; sizes above that are single-sourced and should be confirmed against the standard.</p>
+  <p>The standard selects the <i>tables</i>; the unit toggle only changes how sizes are entered and shown. Negative clearance means interference.</p>
+</footer>
+<script src="app.js" defer></script>
+</body>
+</html>
