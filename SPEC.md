@@ -81,6 +81,8 @@ For the fit: minimum clearance, maximum clearance, type, clearance/interference 
 | Tolerance-class symbol | `25.000 H7` · ANSI: `2.0000 H8 (RC5 hole)` |
 | Tolerance (width) | `0.021` |
 
+Display follows drawing practice (ASME Y14.5, ISO 129-1): limits and nominal + deviations are shown **upper value over lower value**, decimal points aligned, in the CLI text (`calc`, `table`) and on the web page; mean ± half tolerance stays on one line. The one-line strings above are what JSON, CSV and the clipboard carry; `notation.stack` in the JSON gives the stacked parts (`limits.upper/lower`, `deviations.nominal/upper/lower`).
+
 ### 5.2 Number display
 Values native to the standard (inch for ANSI, mm for ISO) print with the fewest decimals that are exact
 (min 4 in / 3 mm). Converted values print with fixed 5 in / 4 mm. `--decimals N` overrides. Rounding is half-away-from-zero on exact integer arithmetic.

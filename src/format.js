@@ -13,7 +13,20 @@ export function decimalsFor(result, override) {
   return Math.max(...vals.map((v) => naturalDecimals(v, result.units, min, max)));
 }
 
-/** All the ways of expressing one feature's size and tolerance. */
+/** Two values written one above the other (upper over lower), padded so their decimal points line up. */
+export function stackLines(upper, lower) {
+  const split = (s) => { const i = s.indexOf('.'); return i < 0 ? [s, ''] : [s.slice(0, i), s.slice(i)]; };
+  const [ui, uf] = split(upper); const [li, lf] = split(lower);
+  const wi = Math.max(ui.length, li.length); const wf = Math.max(uf.length, lf.length);
+  return [ui.padStart(wi) + uf.padEnd(wf), li.padStart(wi) + lf.padEnd(wf)];
+}
+
+/**
+ * All the ways of expressing one feature's size and tolerance. The strings are one-line forms (for
+ * JSON, CSV and the clipboard); `stack` holds the parts that drawings write upper over lower:
+ * limits (largest over smallest) and nominal + deviations (upper over lower deviation).
+ * An equal bilateral tolerance stays on one line (mean ± half tolerance).
+ */
 export function notations(result, kind, decimals) {
   const f = result[kind];
   const u = result.units;
@@ -28,6 +41,10 @@ export function notations(result, kind, decimals) {
     unilateral: `${nominal} ${fs(f.upper)} / ${fs(f.lower)}`,
     bilateral: `${format(mean, u, md)} ± ${format(half, u, md)}`,
     tolerance: fm(f.tolerance),
+    stack: {
+      limits: { upper: fm(f.max), lower: fm(f.min) },
+      deviations: { nominal, upper: fs(f.upper), lower: fs(f.lower) },
+    },
   };
   out.symbol = result.system === 'iso'
     ? `${nominal} ${f.class}`
@@ -78,10 +95,14 @@ export function renderText(result, opts = {}) {
   const w = 24;
   lines.push('');
   lines.push(`${pad('', 24)}${pad('HOLE (internal)', w)}SHAFT (external)`);
-  const row = (label, a, b) => lines.push(`${pad(label, 24)}${pad(a, w)}${b}`);
+  const row = (label, a, b) => lines.push(`${pad(label, 24)}${pad(a, w)}${b}`.trimEnd());
+  const stackRow = (label, [a1, a2], [b1, b2]) => {      // upper deviation over lower
+    const [ha, hb] = stackLines(a1, a2); const [sa, sb] = stackLines(b1, b2);
+    row(label, ha, sa); row('', hb, sb);
+  };
   row('class', result.hole.class, result.shaft.class ?? '—');
-  row(`deviation (${result.nativeUnit})`, `${nat(result.hole.nativeUpper)} / ${nat(result.hole.nativeLower)}`, `${nat(result.shaft.nativeUpper)} / ${nat(result.shaft.nativeLower)}`);
-  row(`deviation (${u})`, `${sgn(result.hole.upper)} / ${sgn(result.hole.lower)}`, `${sgn(result.shaft.upper)} / ${sgn(result.shaft.lower)}`);
+  stackRow(`deviation (${result.nativeUnit})`, [nat(result.hole.nativeUpper), nat(result.hole.nativeLower)], [nat(result.shaft.nativeUpper), nat(result.shaft.nativeLower)]);
+  stackRow(`deviation (${u})`, [sgn(result.hole.upper), sgn(result.hole.lower)], [sgn(result.shaft.upper), sgn(result.shaft.lower)]);
   row('maximum size', fm(result.hole.max), fm(result.shaft.max));
   row('minimum size', fm(result.hole.min), fm(result.shaft.min));
   row('tolerance', fm(result.hole.tolerance), fm(result.shaft.tolerance));
@@ -99,8 +120,14 @@ export function renderText(result, opts = {}) {
     lines.push('Ways to write the same sizes:');
     for (const kind of ['hole', 'shaft']) {
       const nt = notations(result, kind, d);
-      lines.push(`  ${kind === 'hole' ? 'Hole ' : 'Shaft'}  limits      ${nt.limits}`);
-      lines.push(`         nominal+dev ${nt.unilateral}`);
+      const [lu, ll] = stackLines(nt.stack.limits.upper, nt.stack.limits.lower);
+      const dv = nt.stack.deviations;
+      const [du, dl] = stackLines(dv.upper, dv.lower);
+      const indent = ' '.repeat(dv.nominal.length + 1);
+      lines.push(`  ${kind === 'hole' ? 'Hole ' : 'Shaft'}  limits      ${lu}`);
+      lines.push(`                     ${ll}`);
+      lines.push(`         nominal+dev ${dv.nominal} ${du}`);
+      lines.push(`                     ${indent}${dl}`);
       lines.push(`         mean±tol/2  ${nt.bilateral}`);
       lines.push(`         symbol      ${nt.symbol}`);
     }

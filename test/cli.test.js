@@ -5,6 +5,7 @@ import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { stackLines } from '../src/format.js';
 
 const BIN = fileURLToPath(new URL('../bin/fit.js', import.meta.url));
 const run = (...args) => spawnSync(process.execPath, [BIN, ...args], { encoding: 'utf8' });
@@ -56,7 +57,26 @@ test('batch: csv in, csv out, bad rows reported', () => {
   assert.equal(r.status, 1);
 });
 
-test('table prints the standard\'s own row', () => {
+test('table prints the standard\'s own row, upper value over lower', () => {
   const r = run('table', '--system', 'ansi', '--fit', 'RC5', '--nominal', '2');
-  assert.match(r.stdout, /1\.97\s+3\.15\s+2\.5 \.\. 5\.5\s+\+1\.8 \/ 0\s+-2\.5 \/ -3\.7/);
+  const lines = r.stdout.trimEnd().split('\n');
+  assert.match(lines[2], /^1\.97\s+3\.15\s+2\.5\s+\+1\.8\s+-2\.5$/);
+  assert.match(lines[3], /^\s+5\.5\s+0\s+-3\.7$/);
+});
+
+test('calc text: deviations and limits stacked upper over lower, decimals aligned; ± on one line', () => {
+  const out = run('calc', '--system', 'ansi', '--fit', 'RC8', '--nominal', '1.5').stdout.split('\n');
+  const i = out.findIndex((l) => l.startsWith('deviation (thou)'));
+  assert.equal(out[i].indexOf('-5'), out[i + 1].indexOf('-7.5'));        // shaft: -5 over -7.5
+  assert.equal(out[i].indexOf('+4') + 1, out[i + 1].indexOf('0'));       // hole: +4 over 0, units digits aligned
+  const lim = out.findIndex((l) => l.includes('Hole   limits'));
+  assert.match(out[lim], /limits\s+1\.5040$/); assert.match(out[lim + 1], /^\s+1\.5000$/);
+  assert.match(out[lim + 2], /nominal\+dev 1\.5000 \+0\.0040$/); assert.match(out[lim + 3], /^\s+0\.0000$/);
+  assert.match(out[lim + 4], /mean±tol\/2\s+1\.5020 ± 0\.0020$/);
+});
+
+test('stackLines lines up decimal points', () => {
+  assert.deepEqual(stackLines('+0.4', '0'), ['+0.4', ' 0  ']);
+  assert.deepEqual(stackLines('-5', '-7.5'), ['-5  ', '-7.5']);
+  assert.deepEqual(stackLines('+0.00040', '0.00000'), ['+0.00040', ' 0.00000']);
 });

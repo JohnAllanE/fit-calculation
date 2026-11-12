@@ -1,6 +1,6 @@
 // Browser front end: a thin form over src/fit.js (the same engine the CLI uses).
 import { computeFit } from '../src/fit.js';
-import { decimalsFor, notations } from '../src/format.js';
+import { decimalsFor, notations, stackLines } from '../src/format.js';
 import { format, formatSigned, normalizeUnits, parseLength } from '../src/dim.js';
 import { ANSI_FAMILIES, listAnsiClasses } from '../src/ansi.js';
 import { ISO_LETTERS, ISO_MAX_NOMINAL_MM, ISO_PREFERRED_FITS } from '../src/iso.js';
@@ -87,6 +87,11 @@ function writeHash() {
 // ---------------------------------------------------------------- rendering
 const fmtN = (x) => (x > 0 ? '+' : '') + x;
 const el = (tag, props = {}, ...kids) => { const e = Object.assign(document.createElement(tag), props); e.append(...kids); return e; };
+// Upper value over lower, as drawings and the standards' tables write them. Padding uses figure spaces
+// (digit width) so the decimal points line up.
+const stack = (upper, lower) => el('span', { className: 'stack' },
+  ...stackLines(upper, lower).map((t) => el('span', { textContent: t.replaceAll(' ', '\u2007') })));
+const cellOf = (v) => (Array.isArray(v) ? stack(...v) : v);
 
 function update() {
   writeHash();
@@ -137,29 +142,38 @@ function render(r) {
 
   const rows = [
     ['Class', r.hole.class ?? '—', r.shaft.class ?? '—'],
-    [`Deviation (${r.nativeUnit})`, `${fmtN(r.hole.nativeUpper)} / ${fmtN(r.hole.nativeLower)}`, `${fmtN(r.shaft.nativeUpper)} / ${fmtN(r.shaft.nativeLower)}`],
-    [`Deviation (${u})`, `${sg(r.hole.upper)} / ${sg(r.hole.lower)}`, `${sg(r.shaft.upper)} / ${sg(r.shaft.lower)}`],
+    [`Deviation (${r.nativeUnit})`, [fmtN(r.hole.nativeUpper), fmtN(r.hole.nativeLower)], [fmtN(r.shaft.nativeUpper), fmtN(r.shaft.nativeLower)]],
+    [`Deviation (${u})`, [sg(r.hole.upper), sg(r.hole.lower)], [sg(r.shaft.upper), sg(r.shaft.lower)]],
     ['Maximum size', fm(r.hole.max), fm(r.shaft.max), 1],
     ['Minimum size', fm(r.hole.min), fm(r.shaft.min), 1],
     ['Tolerance', fm(r.hole.tolerance), fm(r.shaft.tolerance)],
   ];
-  $('table').tBodies[0].replaceChildren(...rows.map(([k, a, c, strong]) => el('tr', { className: strong ? 'strong' : '' }, el('td', { textContent: k }), el('td', { textContent: a }), el('td', { textContent: c }))));
+  $('table').tBodies[0].replaceChildren(...rows.map(([k, a, c, strong]) => el('tr', { className: strong ? 'strong' : '' }, el('td', { textContent: k }), el('td', {}, cellOf(a)), el('td', {}, cellOf(c)))));
 
   drawDiagram(r);
 
   const nh = notations(r, 'hole', d); const ns = notations(r, 'shaft', d);
-  const nrows = [['Limits (max / min)', 'limits'], ['Nominal + deviations', 'unilateral'], ['Mean ± ½ tolerance', 'bilateral'], ['Tolerance symbol', 'symbol']];
+  const nrows = [['Limits (max over min)', 'limits'], ['Nominal + deviations', 'unilateral'], ['Mean ± ½ tolerance', 'bilateral'], ['Tolerance symbol', 'symbol']];
+  // Shown stacked where drawings stack them; the clipboard gets the one-line form.
+  const shown = (n, key) => (key === 'limits' ? [stack(n.stack.limits.upper, n.stack.limits.lower)]
+    : key === 'unilateral' ? [`${n.stack.deviations.nominal} `, stack(n.stack.deviations.upper, n.stack.deviations.lower)]
+      : [n[key]]);
   $('notations').replaceChildren(
     el('div', { className: 'nrow head' }, el('span', { className: 'nl' }), el('span', { textContent: 'Hole' }), el('span', { textContent: 'Shaft' })),
-    ...nrows.map(([label, key]) => el('div', { className: 'nrow' }, el('span', { className: 'nl', textContent: label }), copyBtn(nh[key]), copyBtn(ns[key]))));
+    ...nrows.map(([label, key]) => el('div', { className: 'nrow' }, el('span', { className: 'nl', textContent: label }),
+      copyBtn(nh[key], shown(nh, key)), copyBtn(ns[key], shown(ns, key)))));
 
   $('trace').replaceChildren(...r.trace.map((t) => el('li', t.startsWith('  ') ? { textContent: t.trim() } : (r.system === 'iso' ? { className: 'group', textContent: t.replace(/:$/, '') } : { textContent: t }))));
 }
 
-function copyBtn(text) {
-  const b = el('button', { type: 'button', textContent: text, title: 'Click to copy' });
+function copyBtn(text, content = [text]) {
+  const b = el('button', { type: 'button', title: `Click to copy: ${text}` }, ...content);
   b.addEventListener('click', async () => {
-    try { await navigator.clipboard.writeText(text); const o = b.textContent; b.textContent = 'copied'; setTimeout(() => { b.textContent = o; }, 700); } catch { /* clipboard unavailable */ }
+    try {
+      await navigator.clipboard.writeText(text);
+      const kids = [...b.childNodes]; b.replaceChildren('copied');
+      setTimeout(() => { b.replaceChildren(...kids); }, 700);
+    } catch { /* clipboard unavailable */ }
   });
   return b;
 }

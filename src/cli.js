@@ -1,7 +1,7 @@
 import { parseArgs } from 'node:util';
 import { readFileSync } from 'node:fs';
 import { computeFit } from './fit.js';
-import { renderText, toJSON } from './format.js';
+import { renderText, stackLines, toJSON } from './format.js';
 import { listAnsiClasses, ansiRows, parseAnsiClass, ANSI_FAMILIES } from './ansi.js';
 import { ISO_LETTERS, ISO_MAX_NOMINAL_MM, ISO_PREFERRED_FITS, isoDeviations, parseIsoClass } from './iso.js';
 import { format, normalizeUnits, parseLength } from './dim.js';
@@ -99,11 +99,18 @@ function table(v) {
     }
     const meta = listAnsiClasses().find((c) => c.name === name);
     console.log(`ANSI/ASME B4.1 ${name} (${meta.description}) - hole ${meta.holeGrade}, shaft ${meta.shaftGrade ?? '(no symbol)'} - thousandths of an inch`);
-    console.log('over   to      fit min..max     hole             shaft');
+    // As the standard prints it: each size range on two lines, fit limits (minimum over maximum)
+    // and hole and shaft deviations (upper over lower).
+    const interf = meta.family === 'LN' || meta.family === 'FN';
+    const fitHead = interf ? 'interference' : meta.family === 'LT' ? 'fit (- interf.)' : 'clearance';
+    console.log(`${'over'.padEnd(7)}${'to'.padEnd(8)}${fitHead.padEnd(17)}${'hole'.padEnd(10)}shaft`);
     const sg = (x) => (x > 0 ? `+${x}` : `${x}`);
     for (const r of rows) {
-      const fit = meta.family === 'LN' || meta.family === 'FN' ? `${-r.fit[1]} .. ${-r.fit[0]} (interf.)` : `${r.fit[0]} .. ${r.fit[1]}`;
-      console.log(`${String(r.over).padEnd(7)}${String(r.to).padEnd(8)}${fit.padEnd(20)}${(sg(r.hole[0]) + ' / ' + sg(r.hole[1])).padEnd(17)}${sg(r.shaft[0])} / ${sg(r.shaft[1])}`);
+      const fit = interf ? stackLines(String(-r.fit[1]), String(-r.fit[0]))
+        : meta.family === 'LT' ? stackLines(sg(r.fit[0]), sg(r.fit[1])) : stackLines(String(r.fit[0]), String(r.fit[1]));
+      const hole = stackLines(sg(r.hole[0]), sg(r.hole[1])); const shaft = stackLines(sg(r.shaft[0]), sg(r.shaft[1]));
+      console.log(`${String(r.over).padEnd(7)}${String(r.to).padEnd(8)}${fit[0].padEnd(17)}${hole[0].padEnd(10)}${shaft[0]}`.trimEnd());
+      console.log(`${''.padEnd(15)}${fit[1].padEnd(17)}${hole[1].padEnd(10)}${shaft[1]}`.trimEnd());
     }
     return;
   }
